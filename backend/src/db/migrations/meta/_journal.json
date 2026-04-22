@@ -8,6 +8,13 @@
       "when": 1753357957821,
       "tag": "0000_lazy_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776881028269,
+      "tag": "0001_stiff_triathlon",
+      "breakpoints": true
     }
   ]
 }
