@@ -7,6 +7,10 @@ const coffeeTheme = {
   textLight: "#9A8478",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const forestTheme = {
@@ -18,6 +22,10 @@ const forestTheme = {
   textLight: "#66BB6A",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const purpleTheme = {
@@ -29,6 +37,10 @@ const purpleTheme = {
   textLight: "#BA68C8",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const oceanTheme = {
@@ -40,6 +52,10 @@ const oceanTheme = {
   textLight: "#4FC3F7",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const sunsetTheme = {
@@ -51,6 +67,10 @@ const sunsetTheme = {
   textLight: "#FFA494",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const mintTheme = {
@@ -62,6 +82,10 @@ const mintTheme = {
   textLight: "#66D9D9",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const midnightTheme = {
@@ -73,6 +97,10 @@ const midnightTheme = {
   textLight: "#7F8C8D",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 const roseGoldTheme = {
@@ -84,6 +112,10 @@ const roseGoldTheme = {
   textLight: "#C9A9A6",
   card: "#FFFFFF",
   shadow: "#000000",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#F44336",
+  info: "#2196F3",
 };
 
 export const THEMES = {
@@ -97,4 +129,4 @@ export const THEMES = {
   roseGold: roseGoldTheme,
 };
 
-export const COLORS = THEMES.purple;
+export const COLORS = THEMES.sunset;
