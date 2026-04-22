@@ -1,213 +1,109 @@
-import { View, Text, ScrollView, TouchableOpacity, FlatList, RefreshControl } from "react-native";
+import { View, Text, FlatList, RefreshControl, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { MealAPI } from "../../services/mealAPI";
-import { homeStyles } from "../../assets/styles/home.styles";
+import { API_URL } from "../../constants/api";
+import { restaurantStyles } from "../../assets/styles/restaurant.styles";
 import { Image } from "expo-image";
 import { COLORS } from "../../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
-import CategoryFilter from "../../components/CategoryFilter";
-import RecipeCard from "../../components/RecipeCard";
 import LoadingSpinner from "../../components/LoadingSpinner";
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const HomeScreen = () => {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [recipes, setRecipes] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [featuredRecipe, setFeaturedRecipe] = useState(null);
+  const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
+  const loadRestaurants = async () => {
     try {
       setLoading(true);
-
-      const [apiCategories, randomMeals, featuredMeal] = await Promise.all([
-        MealAPI.getCategories(),
-        MealAPI.getRandomMeals(12),
-        MealAPI.getRandomMeal(),
-      ]);
-
-      const transformedCategories = apiCategories.map((cat, index) => ({
-        id: index + 1,
-        name: cat.strCategory,
-        image: cat.strCategoryThumb,
-        description: cat.strCategoryDescription,
-      }));
-
-      setCategories(transformedCategories);
-
-      if (!selectedCategory) setSelectedCategory(transformedCategories[0].name);
-
-      const transformedMeals = randomMeals
-        .map((meal) => MealAPI.transformMealData(meal))
-        .filter((meal) => meal !== null);
-
-      setRecipes(transformedMeals);
-
-      const transformedFeatured = MealAPI.transformMealData(featuredMeal);
-      setFeaturedRecipe(transformedFeatured);
+      const response = await fetch(`${API_URL}/restaurants`);
+      const restaurantsData = await response.json();
+      setRestaurants(restaurantsData);
     } catch (error) {
-      console.log("Error loading the data", error);
+      console.error("Error loading restaurants:", error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
-
-  const loadCategoryData = async (category) => {
-    try {
-      const meals = await MealAPI.filterByCategory(category);
-      const transformedMeals = meals
-        .map((meal) => MealAPI.transformMealData(meal))
-        .filter((meal) => meal !== null);
-      setRecipes(transformedMeals);
-    } catch (error) {
-      console.error("Error loading category data:", error);
-      setRecipes([]);
-    }
-  };
-
-  const handleCategorySelect = async (category) => {
-    setSelectedCategory(category);
-    await loadCategoryData(category);
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // await sleep(2000);
-    await loadData();
-    setRefreshing(false);
   };
 
   useEffect(() => {
-    loadData();
+    loadRestaurants();
   }, []);
 
-  if (loading && !refreshing) return <LoadingSpinner message="Loading delicions recipes..." />;
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadRestaurants();
+  };
+
+  const handleRestaurantPress = (restaurant) => {
+    router.push(`/restaurant/${restaurant.id}`);
+  };
+
+  const renderRestaurantCard = ({ item }) => (
+    <TouchableOpacity
+      style={restaurantStyles.restaurantCard}
+      onPress={() => handleRestaurantPress(item)}
+    >
+      <Image
+        source={{ uri: item.image || "https://via.placeholder.com/300x200" }}
+        style={restaurantStyles.restaurantImage}
+        contentFit="cover"
+      />
+      <View style={restaurantStyles.restaurantInfo}>
+        <Text style={restaurantStyles.restaurantName}>{item.name}</Text>
+        <Text style={restaurantStyles.restaurantCuisine}>{item.cuisine}</Text>
+        <Text style={restaurantStyles.restaurantDescription} numberOfLines={2}>
+          {item.description}
+        </Text>
+        <View style={restaurantStyles.restaurantMeta}>
+          <View style={restaurantStyles.locationContainer}>
+            <Ionicons name="location-outline" size={16} color={COLORS.textLight} />
+            <Text style={restaurantStyles.restaurantAddress} numberOfLines={1}>
+              {item.address || "Address not available"}
+            </Text>
+          </View>
+          <TouchableOpacity style={restaurantStyles.viewMenuButton}>
+            <Text style={restaurantStyles.viewMenuText}>View Menu</Text>
+            <Ionicons name="arrow-forward" size={16} color={COLORS.white} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <View style={homeStyles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
-          />
-        }
-        contentContainerStyle={homeStyles.scrollContent}
-      >
-        {/*  ANIMAL ICONS */}
-        <View style={homeStyles.welcomeSection}>
-          <Image
-            source={require("../../assets/images/lamb.png")}
-            style={{
-              width: 100,
-              height: 100,
-            }}
-          />
-          <Image
-            source={require("../../assets/images/chicken.png")}
-            style={{
-              width: 100,
-              height: 100,
-            }}
-          />
-          <Image
-            source={require("../../assets/images/pork.png")}
-            style={{
-              width: 100,
-              height: 100,
-            }}
-          />
+    <View style={restaurantStyles.container}>
+      <View style={restaurantStyles.header}>
+        <Text style={restaurantStyles.title}>Restaurants</Text>
+        <Text style={restaurantStyles.subtitle}>Discover amazing food near you</Text>
+      </View>
+
+      {restaurants.length === 0 ? (
+        <View style={restaurantStyles.emptyState}>
+          <Ionicons name="restaurant-outline" size={64} color={COLORS.textLight} />
+          <Text style={restaurantStyles.emptyTitle}>No Restaurants Available</Text>
+          <Text style={restaurantStyles.emptySubtitle}>Check back later for new restaurants</Text>
         </View>
-
-        {/* FEATURED SECTION */}
-        {featuredRecipe && (
-          <View style={homeStyles.featuredSection}>
-            <TouchableOpacity
-              style={homeStyles.featuredCard}
-              activeOpacity={0.9}
-              onPress={() => router.push(`/recipe/${featuredRecipe.id}`)}
-            >
-              <View style={homeStyles.featuredImageContainer}>
-                <Image
-                  source={{ uri: featuredRecipe.image }}
-                  style={homeStyles.featuredImage}
-                  contentFit="cover"
-                  transition={500}
-                />
-                <View style={homeStyles.featuredOverlay}>
-                  <View style={homeStyles.featuredBadge}>
-                    <Text style={homeStyles.featuredBadgeText}>Featured</Text>
-                  </View>
-
-                  <View style={homeStyles.featuredContent}>
-                    <Text style={homeStyles.featuredTitle} numberOfLines={2}>
-                      {featuredRecipe.title}
-                    </Text>
-
-                    <View style={homeStyles.featuredMeta}>
-                      <View style={homeStyles.metaItem}>
-                        <Ionicons name="time-outline" size={16} color={COLORS.white} />
-                        <Text style={homeStyles.metaText}>{featuredRecipe.cookTime}</Text>
-                      </View>
-                      <View style={homeStyles.metaItem}>
-                        <Ionicons name="people-outline" size={16} color={COLORS.white} />
-                        <Text style={homeStyles.metaText}>{featuredRecipe.servings}</Text>
-                      </View>
-                      {featuredRecipe.area && (
-                        <View style={homeStyles.metaItem}>
-                          <Ionicons name="location-outline" size={16} color={COLORS.white} />
-                          <Text style={homeStyles.metaText}>{featuredRecipe.area}</Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {categories.length > 0 && (
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
-          />
-        )}
-
-        <View style={homeStyles.recipesSection}>
-          <View style={homeStyles.sectionHeader}>
-            <Text style={homeStyles.sectionTitle}>{selectedCategory}</Text>
-          </View>
-
-          {recipes.length > 0 ? (
-            <FlatList
-              data={recipes}
-              renderItem={({ item }) => <RecipeCard recipe={item} />}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              columnWrapperStyle={homeStyles.row}
-              contentContainerStyle={homeStyles.recipesGrid}
-              scrollEnabled={false}
-              // ListEmptyComponent={}
-            />
-          ) : (
-            <View style={homeStyles.emptyState}>
-              <Ionicons name="restaurant-outline" size={64} color={COLORS.textLight} />
-              <Text style={homeStyles.emptyTitle}>No recipes found</Text>
-              <Text style={homeStyles.emptyDescription}>Try a different category</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+      ) : (
+        <FlatList
+          data={restaurants}
+          renderItem={renderRestaurantCard}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={restaurantStyles.listContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };
+
 export default HomeScreen;
