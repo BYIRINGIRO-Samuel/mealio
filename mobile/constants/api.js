@@ -1,1 +1,4 @@
-export const API_URL = "http://localhost:5001/api";
+// Use dynamic network configuration
+import { API_URL } from './network';
+
+export { API_URL };
