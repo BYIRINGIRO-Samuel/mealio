@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 // Function to get the correct API URL based on platform and environment
 export const getApiUrl = () => {
     // For development, use your computer's IP address
-    const DEVELOPMENT_IP = "10.12.75.131"; // Your current IP
+    const DEVELOPMENT_IP = "10.12.75.131"; 
     const PORT = "5001";
 
     if (__DEV__) {
