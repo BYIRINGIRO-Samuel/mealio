@@ -53,7 +53,7 @@ async function fullSeed() {
 
         // Add more menu items
         const moreMenuItems = await db.insert(menuItemsTable).values([
-            // Bella Vista Pizza
+            
             {
                 restaurantId: 1,
                 categoryId: bellaVistaCategories[0].id,
