@@ -64,7 +64,7 @@ async function fullSeed() {
                 preparationTime: 25,
                 isVegetarian: true
             },
-            // Sakura Sushi
+        
             {
                 restaurantId: 2,
                 categoryId: sakuraCategories[0].id,
